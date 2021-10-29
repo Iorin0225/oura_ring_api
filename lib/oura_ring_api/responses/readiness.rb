@@ -15,6 +15,7 @@ module OuraRingApi
           "readiness"
         end
 
+        DATE_KEY = "summary_date"
         KEYS = %w[
           summary_date
           period_id

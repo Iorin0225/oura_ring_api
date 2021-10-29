@@ -15,6 +15,7 @@ module OuraRingApi
           "activity"
         end
 
+        DATE_KEY = "summary_date"
         KEYS = %w[
           summary_date
           timezone
@@ -96,10 +97,44 @@ module OuraRingApi
           met_1min
         ].freeze
 
+        DURATION_KEYS = %w[
+          non_wear
+          rest
+          inactive
+          low
+          medium
+          high
+          rest_mode_state
+          total
+        ].freeze
+
         # I couldn't put this on base class ><
         KEYS.each do |key|
           define_method(key) do
             body[key]
+          end
+        end
+
+        DURATION_KEYS.each do |key|
+          define_method("#{key}_format") do
+            Time.at(body[key]*60).utc.strftime("%H:%M:%S")
+          end
+        end
+
+        def rest_mode_state_format
+          case rest_mode_state
+          when 0
+            "Off"
+          when 1
+            "Entering Rest Mode"
+          when 2
+            "Rest Mode"
+          when 3
+            "Entering recovery"
+          when 4
+            "Recovering"
+          else
+            "Invalid Data"
           end
         end
       end

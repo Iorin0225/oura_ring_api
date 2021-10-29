@@ -15,6 +15,7 @@ module OuraRingApi
           "sleep"
         end
 
+        DATE_KEY = "summary_date"
         KEYS = %w[
           summary_date
           period_id
@@ -98,10 +99,30 @@ module OuraRingApi
           rmssd_5min
         ].freeze
 
+        DURATION_KEYS = %w[
+          duration
+          total
+          awake
+          rem
+          deep
+          light
+          midpoint_time
+          onset_latency
+          bedtime_start_delta
+          bedtime_end_delta
+          midpoint_at_delta
+        ].freeze
+
         # I couldn't put this on base class ><
         KEYS.each do |key|
           define_method(key) do
             body[key]
+          end
+        end
+
+        DURATION_KEYS.each do |key|
+          define_method("#{key}_format") do
+            Time.at(body[key]).utc.strftime("%H:%M:%S")
           end
         end
       end

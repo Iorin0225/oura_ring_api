@@ -5,6 +5,7 @@ require_relative "responses/userinfo"
 require_relative "responses/sleep"
 require_relative "responses/activity"
 require_relative "responses/readiness"
+require_relative "responses/bedtime"
 
 module OuraRingApi
   class Client
@@ -13,6 +14,7 @@ module OuraRingApi
     SLEEP_PATH     = "/v1/sleep"
     ACTIVITY_PATH  = "/v1/activity"
     READINESS_PATH = "/v1/readiness"
+    BEDTIME_PATH = "/v1/bedtime"
 
     def initialize(client_id: nil,
                    client_secret: nil,
@@ -67,6 +69,16 @@ module OuraRingApi
       }
       response = request_api(READINESS_PATH, :get, params)
       OuraRingApi::Response::Readiness.new(response)
+    end
+
+    def bedtime(start_date = nil,
+                end_date = nil)
+      params = {
+        start: start_date,
+        end: end_date
+      }
+      response = request_api(BEDTIME_PATH, :get, params)
+      OuraRingApi::Response::Bedtime.new(response)
     end
 
     private
