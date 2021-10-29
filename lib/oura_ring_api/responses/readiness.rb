@@ -7,10 +7,10 @@ module OuraRingApi
     class Readiness < Base
       def find_by_date(date)
         date = date.strftime("%Y-%m-%d") if date.respond_to?(:strftime)
-        records.select { |row| row.summary_date == date }
+        records.select { |record| record.summary_date == date }
       end
 
-      class Row < ::OuraRingApi::Response::Base::Row
+      class Record < ::OuraRingApi::Response::Base::Record
         def self.record_key
           "readiness"
         end
@@ -30,10 +30,12 @@ module OuraRingApi
           rest_mode_state
         ].freeze
 
+        SUMMARY_DATA_KEYS = KEYS
+
         # I couldn't put this on base class ><
         KEYS.each do |key|
           define_method(key) do
-            record[key]
+            body[key]
           end
         end
       end

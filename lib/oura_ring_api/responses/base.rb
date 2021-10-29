@@ -26,14 +26,14 @@ module OuraRingApi
         response.body
       end
 
-      def row_class
-        Kernel.const_get "#{self.class.name}::Row"
+      def record_class
+        Kernel.const_get "#{self.class.name}::Record"
       end
 
       def parse_to_records!
         return unless multiple?
 
-        self.records = row_class.parse!(response)
+        self.records = record_class.parse!(response)
       end
 
       def find_by_date(_date)
@@ -42,18 +42,33 @@ module OuraRingApi
         raise "Please implement this in #{name}."
       end
 
-      class Row
-        attr_accessor :record
+      def score_summary
+        records.map do |record|
+          { record.summary_date.to_s => record.score }
+        end
+      end
+
+      def summary_by_date(keys = record_class::SUMMARY_DATA_KEYS)
+        records.map do |record|
+          data = keys.map { |key| { key => record.send(key) } }
+          { record.summary_date.to_s => data }
+        end
+      end
+
+      class Record
+        attr_accessor :body
 
         KEYS = %w[].freeze # put keys on child class
+        SUMMARY_DATA_KEYS = %w[].freeze # put keys about summary data
+        DETAIL_DATA_KEYS = %w[].freeze # put keys about detailed data
 
-        def initialize(record)
-          self.record = record
+        def initialize(row_body)
+          self.body = row_body
         end
 
         def self.parse!(response)
-          response.body[record_key].map do |row|
-            new(row)
+          response.body[record_key].map do |record|
+            new(record)
           end
         end
 
