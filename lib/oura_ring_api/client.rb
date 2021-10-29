@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 require_relative "services/oauth_helper"
+require_relative "responses/userinfo"
+require_relative "responses/sleep"
+require_relative "responses/activity"
+require_relative "responses/readiness"
 
 module OuraRingApi
   class Client
@@ -31,25 +35,8 @@ module OuraRingApi
     end
 
     def userinfo
-      request_api(USERINFO_PATH, :get, nil)
-    end
-
-    def activity_summary(start_date = nil,
-                         end_date = nil)
-      params = {
-        start: start_date,
-        end: end_date
-      }
-      request_api(ACTIVITY_PATH, :get, params)
-    end
-
-    def readiness_summary(start_date = nil,
-                          end_date = nil)
-      params = {
-        start: start_date,
-        end: end_date
-      }
-      request_api(READINESS_PATH, :get, params)
+      response = request_api(USERINFO_PATH, :get, nil)
+      OuraRingApi::Response::Userinfo.new(response)
     end
 
     def sleep_summary(start_date = nil,
@@ -58,7 +45,28 @@ module OuraRingApi
         start: start_date,
         end: end_date
       }
-      request_api(SLEEP_PATH, :get, params)
+      response = request_api(SLEEP_PATH, :get, params)
+      OuraRingApi::Response::Sleep.new(response)
+    end
+
+    def activity_summary(start_date = nil,
+                         end_date = nil)
+      params = {
+        start: start_date,
+        end: end_date
+      }
+      response = request_api(ACTIVITY_PATH, :get, params)
+      OuraRingApi::Response::Activity.new(response)
+    end
+
+    def readiness_summary(start_date = nil,
+                          end_date = nil)
+      params = {
+        start: start_date,
+        end: end_date
+      }
+      response = request_api(READINESS_PATH, :get, params)
+      OuraRingApi::Response::Readiness.new(response)
     end
 
     private
@@ -66,7 +74,7 @@ module OuraRingApi
     def request_api(path, method, params)
       response = api_client.send(method) do |req|
         req.url path
-        req.params = params
+        req.params = params unless params.nil?
       end
       case response.status
       when 401
