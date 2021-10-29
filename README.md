@@ -1,8 +1,8 @@
 # OuraRingApi
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/oura_ring_api`. To experiment with that code, run `bin/console` for an interactive prompt.
+This gem handles communicating with Oura Cloud API, the API service with OuraRing!
 
-TODO: Delete this and the text above, and describe your gem
+If you want to know more detail, see this: https://cloud.ouraring.com/docs
 
 ## Installation
 
@@ -22,7 +22,62 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+This gem has 2 ways to use.
+
+### Personal Access Token (for development)
+
+This is really simple and easy to use, but it's only for development
+
+#### 1. Create you Personal Access Token on Oura Cloud.
+
+Access here: https://cloud.ouraring.com/personal-access-tokens
+
+#### 2. Set the token to the client class
+
+```rb
+client = OuraRingApi::Client.new(personal_access_token: your_token)
+client.userinfo.body # This would work
+```
+
+### OAuth2 Flow
+
+Oura Cloud requires us to use OAuth2 Authentication flow for third party app.
+
+#### 1. Register your application on Oura Cloud.
+
+Access here: https://cloud.ouraring.com/oauth/applications
+
+(At now, please use "http://localhost:8080" for redirect url. It's just WIP :bow: )
+
+After you register your application, you will get Client ID and Client Secret.
+
+#### 2. Set Client ID and Client Secret to the client class
+
+```rb
+client = OuraRingApi::Client.new(client_id: your_id, client_secret: your_secret)
+```
+
+#### 3. Get an access_token
+
+The client class generate an url to generate access token.
+
+```rb
+ client.url_to_generate_code
+=> "https://cloud.ouraring.com/oauth/authorize?client_id=******&redirect_uri=http://localhost:8080&response_type=code"
+```
+
+Access the URL and then please "Acceppt". 
+
+After that, you'll be redirected to the URL like `http://localhost:8080/?code=***&scope=email%20personal%20daily`. So please copy the code on the URL.
+
+#### 4. Set the code to the client
+
+```rb
+client.authenticate(code: '****')
+=> {:access_token=>"****", :refresh_token=>"****", :expires_at=>"2021-10-30 17:05:18"}
+
+client.userinfo.body # This would work
+```
 
 ## Development
 
