@@ -79,6 +79,17 @@ client.authenticate(code: '****')
 client.userinfo.body # This would work
 ```
 
+#### 5. Initialize the client with the result of Oauth2
+
+You can re-use the result of OAuth2by 
+
+```rb
+your_token_info = {:access_token=>"****", :refresh_token=>"****", :expires_at=>"2021-10-30 17:05:18"}
+client = OuraRingApi::Client.new(token_info: your_token_info)
+
+client.userinfo.body # This would work
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
