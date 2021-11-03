@@ -107,7 +107,7 @@ module OuraRingApi
         faraday.response :json, content_type: /\bjson$/
         faraday.adapter Faraday.default_adapter
       end
-      client.authorization :Bearer, access_token
+      client.request(:authorization, :Bearer, access_token)
       client
     end
 
