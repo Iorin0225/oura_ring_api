@@ -29,9 +29,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'oauth2', '~> 1.4.0'
-  spec.add_dependency 'faraday', '~> 0.12.2'
-  spec.add_dependency 'faraday_middleware', '~> 0.12.2'
+  spec.add_dependency 'oauth2'
+  spec.add_dependency 'faraday'
+  spec.add_dependency 'faraday_middleware'
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html
