@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 require_relative "services/oauth_helper"
-require_relative "responses/userinfo"
-require_relative "responses/sleep"
-require_relative "responses/activity"
-require_relative "responses/readiness"
-require_relative "responses/bedtime"
+
+require_relative "responses/v1/userinfo"
+require_relative "responses/v1/sleep"
+require_relative "responses/v1/activity"
+require_relative "responses/v1/readiness"
+require_relative "responses/v1/bedtime"
+
 
 module OuraRingApi
   class Client
@@ -38,7 +40,7 @@ module OuraRingApi
 
     def userinfo
       response = request_api(USERINFO_PATH, :get, nil)
-      OuraRingApi::Response::Userinfo.new(response)
+      OuraRingApi::Response::V1::Userinfo.new(response)
     end
 
     def sleep_summary(start_date = nil,
@@ -48,7 +50,7 @@ module OuraRingApi
         end: end_date
       }
       response = request_api(SLEEP_PATH, :get, params)
-      OuraRingApi::Response::Sleep.new(response)
+      OuraRingApi::Response::V1::Sleep.new(response)
     end
 
     def activity_summary(start_date = nil,
@@ -58,7 +60,7 @@ module OuraRingApi
         end: end_date
       }
       response = request_api(ACTIVITY_PATH, :get, params)
-      OuraRingApi::Response::Activity.new(response)
+      OuraRingApi::Response::V1::Activity.new(response)
     end
 
     def readiness_summary(start_date = nil,
@@ -68,7 +70,7 @@ module OuraRingApi
         end: end_date
       }
       response = request_api(READINESS_PATH, :get, params)
-      OuraRingApi::Response::Readiness.new(response)
+      OuraRingApi::Response::V1::Readiness.new(response)
     end
 
     def bedtime(start_date = nil,
@@ -78,7 +80,7 @@ module OuraRingApi
         end: end_date
       }
       response = request_api(BEDTIME_PATH, :get, params)
-      OuraRingApi::Response::Bedtime.new(response)
+      OuraRingApi::Response::V1::Bedtime.new(response)
     end
 
     private

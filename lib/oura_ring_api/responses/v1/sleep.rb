@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "base"
+require_relative "../base"
 
 module OuraRingApi
-  module Response
-    class Sleep < Base
+  module Response::V1
+    class Sleep < OuraRingApi::Response::Base
       def find_by_date(date)
         date = date.strftime("%Y-%m-%d") if date.respond_to?(:strftime)
         records.select { |record| record.summary_date == date }
