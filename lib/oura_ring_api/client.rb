@@ -8,6 +8,8 @@ require_relative "responses/v1/activity"
 require_relative "responses/v1/readiness"
 require_relative "responses/v1/bedtime"
 
+require_relative "responses/personal_info"
+
 
 module OuraRingApi
   class Client
@@ -17,6 +19,8 @@ module OuraRingApi
     ACTIVITY_PATH  = "/v1/activity"
     READINESS_PATH = "/v1/readiness"
     BEDTIME_PATH = "/v1/bedtime"
+
+    PERSONAL_INFO_PATH = "/v2/usercollection/personal_info"
 
     def initialize(client_id: nil,
                    client_secret: nil,
@@ -37,6 +41,15 @@ module OuraRingApi
     def authenticate(code:)
       @oauth_handler.fetch_token_from_code(code)
     end
+
+    # V2 =============
+
+    def personal_info
+      response = request_api(PERSONAL_INFO_PATH, :get, nil)
+      OuraRingApi::Response::PersonalInfo.new(response)
+    end
+
+    # V1 =============
 
     def userinfo
       response = request_api(USERINFO_PATH, :get, nil)
