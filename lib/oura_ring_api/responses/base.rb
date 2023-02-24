@@ -2,7 +2,7 @@
 
 module OuraRingApi
   module Response
-    class Base
+    class Base # rubocop:todo Style/Documentation
       attr_accessor :response
       attr_accessor :records
 
@@ -71,7 +71,7 @@ module OuraRingApi
         record_with_day[day]
       end
 
-      class Record
+      class Record # rubocop:todo Style/Documentation
         attr_accessor :original_record
 
         def initialize(original_record)

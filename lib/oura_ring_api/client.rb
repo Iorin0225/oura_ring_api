@@ -17,7 +17,7 @@ require_relative "responses/daily_readiness"
 require_relative "responses/sleep"
 
 module OuraRingApi
-  class Client
+  class Client # rubocop:todo Style/Documentation
     OURA_API_URL = "https://api.ouraring.com"
 
     V1_USERINFO_PATH  = "/v1/userinfo"

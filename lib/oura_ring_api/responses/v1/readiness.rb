@@ -4,13 +4,13 @@ require_relative "base"
 
 module OuraRingApi
   module Response::V1
-    class Readiness < OuraRingApi::Response::V1::Base
+    class Readiness < OuraRingApi::Response::V1::Base # rubocop:todo Style/Documentation
       def find_by_date(date)
         date = date.strftime("%Y-%m-%d") if date.respond_to?(:strftime)
         records.select { |record| record.summary_date == date }
       end
 
-      class Record < ::OuraRingApi::Response::V1::Base::Record
+      class Record < ::OuraRingApi::Response::V1::Base::Record # rubocop:todo Style/Documentation
         def self.record_key
           "readiness"
         end
