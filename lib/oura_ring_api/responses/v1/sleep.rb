@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
-require_relative "../base"
+require_relative "base"
 
 module OuraRingApi
   module Response::V1
-    class Sleep < OuraRingApi::Response::Base
+    class Sleep < OuraRingApi::Response::V1::Base
       def find_by_date(date)
         date = date.strftime("%Y-%m-%d") if date.respond_to?(:strftime)
         records.select { |record| record.summary_date == date }
       end
 
-      class Record < ::OuraRingApi::Response::Base::Record
+      class Record < ::OuraRingApi::Response::V1::Base::Record
         def self.record_key
           "sleep"
         end
+
 
         DATE_KEY = "summary_date"
         KEYS = %w[
@@ -23,7 +24,9 @@ module OuraRingApi
           timezone
           bedtime_end
           bedtime_start
+          type
           breath_average
+          average_breath_variation
           duration
           total
           awake
@@ -34,6 +37,8 @@ module OuraRingApi
           efficiency
           restless
           onset_latency
+          got_up_count
+          wake_up_count
           hr_5min
           hypnogram_5min
           rmssd
@@ -54,6 +59,7 @@ module OuraRingApi
           temperature_delta
           hr_lowest
           hr_average
+          lowest_heart_rate_time_offset
         ].freeze
 
         SUMMARY_DATA_KEYS = %w[
@@ -63,7 +69,9 @@ module OuraRingApi
           timezone
           bedtime_end
           bedtime_start
+          type
           breath_average
+          average_breath_variation
           duration
           total
           awake
@@ -74,6 +82,8 @@ module OuraRingApi
           efficiency
           restless
           onset_latency
+          got_up_count
+          wake_up_count
           rmssd
           score
           score_alignment
@@ -91,6 +101,7 @@ module OuraRingApi
           temperature_delta
           hr_lowest
           hr_average
+          lowest_heart_rate_time_offset
         ].freeze
 
         DETAIL_DATA_KEYS = %w[

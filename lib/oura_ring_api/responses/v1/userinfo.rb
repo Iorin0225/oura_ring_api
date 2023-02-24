@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "../base"
+require_relative "base"
 
 module OuraRingApi
   module Response::V1
-    class Userinfo < OuraRingApi::Response::Base
+    class Userinfo < OuraRingApi::Response::V1::Base
       def multiple?
         false
       end

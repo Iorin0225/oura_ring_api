@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require_relative "../base"
+require_relative "base"
 
 module OuraRingApi
   module Response::V1
-    class Activity < OuraRingApi::Response::Base
+    class Activity < OuraRingApi::Response::V1::Base
       def find_by_date(date)
         date = date.strftime("%Y-%m-%d") if date.respond_to?(:strftime)
         records.select { |record| record.summary_date == date }
       end
 
-      class Record < ::OuraRingApi::Response::Base::Record
+      class Record < ::OuraRingApi::Response::V1::Base::Record
         def self.record_key
           "activity"
         end
