@@ -3,91 +3,92 @@
 module OuraRingApi
   module Response
     class Base # rubocop:todo Style/Documentation
-      attr_accessor :response, :records
+      attr_accessor :response
+      attr_accessor :records
 
       def initialize(response)
         self.response = response
-        parse_to_records! if success? && multiple?
-      end
-
-      def multiple?
-        true
+        parse_to_records
       end
 
       def success?
         response.success?
       end
 
-      def status
-        response.status
+      def data
+        if response.body.key?("data")
+          response.body["data"]
+        else
+          [response.body]
+        end
       end
 
-      def body
-        response.body
+      def data_with_day
+        return @data_with_day if @data_with_day
+
+        @data_with_day = {}
+        data.each do |data_row|
+          @data_with_day[data_row["day"]] = data_row
+        end
+
+        @data_with_day
       end
+
+      def data_by_day(day)
+        data_with_day[day]
+      end
+
+      def days
+        data_with_day.keys
+      end
+
+      alias keys days
 
       def record_class
         Kernel.const_get "#{self.class.name}::Record"
       end
 
-      def parse_to_records!
-        return unless multiple?
+      def parse_to_records
+        self.records = []
 
-        self.records = record_class.parse!(response)
-      end
-
-      def find_by_date(_date)
-        raise "#{self.class.name} isn't multiple response." unless multiple?
-
-        raise "Please implement this in #{name}."
-      end
-
-      def score_summary
-        records.map do |record|
-          { record.summary_date.to_s => record.score }
+        data.each do |data_row|
+          records << record_class.new(data_row)
         end
       end
 
-      def summary_by_date(keys = record_class::SUMMARY_DATA_KEYS)
-        records.map do |record|
-          data = keys.map do |key|
-            value = if record.respond_to?("#{key}_format")
-                      record.send("#{key}_format")
-                    else
-                      record.send(key)
-                    end
+      def record_with_day
+        return @record_with_day if @record_with_day
 
-            { key => value }
-          end
-          { record.send(record_class::DATE_KEY).to_s => data }
+        @record_with_day = {}
+        records.each do |record|
+          @record_with_day[record.day] = record
         end
+
+        @record_with_day
+      end
+
+      def record_by_day(day)
+        record_with_day[day]
       end
 
       class Record # rubocop:todo Style/Documentation
-        attr_accessor :body
+        attr_accessor :original_record
 
-        KEYS              = %w[].freeze # keys on child class
-        SUMMARY_DATA_KEYS = %w[].freeze # keys about summary data
-        DETAIL_DATA_KEYS  = %w[].freeze # keys about detailed data
-        DATE_KEY          = %w[].freeze # date key of each row
-        DURATION_KEY      = %w[].freeze # these keys will be converted to Time
-
-        def initialize(row_body)
-          self.body = row_body
+        def initialize(original_record)
+          self.original_record = original_record
+          hash_key_to_method
         end
 
-        def self.parse!(response)
-          response.body[record_key].map do |record|
-            new(record)
+        def hash_key_to_method
+          original_record.keys.each do |key|
+            self.class.send(:define_method, key) do
+              original_record[key]
+            end
           end
         end
 
-        def self.record_key
-          raise "Please implement this in #{name}."
-        end
-
         def keys
-          self.class::KEYS
+          original_record.keys
         end
       end
     end

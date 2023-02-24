@@ -4,7 +4,7 @@ require_relative "base"
 
 module OuraRingApi
   module Response
-    class Sleep < Base # rubocop:todo Style/Documentation
+    class DailySleep < Base
       class Record < Base::Record
       end
     end

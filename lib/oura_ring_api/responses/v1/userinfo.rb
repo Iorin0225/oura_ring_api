@@ -3,8 +3,8 @@
 require_relative "base"
 
 module OuraRingApi
-  module Response
-    class Userinfo < Base # rubocop:todo Style/Documentation
+  module Response::V1
+    class Userinfo < OuraRingApi::Response::V1::Base # rubocop:todo Style/Documentation
       def multiple?
         false
       end
