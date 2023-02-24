@@ -4,7 +4,7 @@ require_relative "base"
 
 module OuraRingApi
   module Response
-    class Userinfo < Base
+    class Userinfo < Base # rubocop:todo Style/Documentation
       def multiple?
         false
       end

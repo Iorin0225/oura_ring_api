@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = "This gem gives you a client to handle communicating with OuraRing via API."
   spec.homepage      = "https://github.com/iorin0225/oura_ring_api"
   spec.license       = "MIT"
-  spec.required_ruby_version = Gem::Requirement.new(">= 2.4.0")
+  spec.required_ruby_version = Gem::Requirement.new(">= 3.0.4")
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
@@ -29,9 +29,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'oauth2'
-  spec.add_dependency 'faraday'
-  spec.add_dependency 'faraday_middleware'
+  spec.add_dependency "faraday"
+  spec.add_dependency "faraday_middleware"
+  spec.add_dependency "oauth2"
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OuraRingApi
-  class OauthHandler
+  class OauthHandler # rubocop:todo Style/Documentation
     CALLBACK_URL  = "http://localhost:8080"
     OAUTH2_SITE   = "https://cloud.ouraring.com"
     OAUTH2_URL    = "#{OAUTH2_SITE}/oauth/authorize"

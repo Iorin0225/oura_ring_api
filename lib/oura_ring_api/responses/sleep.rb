@@ -4,13 +4,15 @@ require_relative "base"
 
 module OuraRingApi
   module Response
-    class Sleep < Base
+    class Sleep < Base # rubocop:todo Style/Documentation
       def find_by_date(date)
         date = date.strftime("%Y-%m-%d") if date.respond_to?(:strftime)
         records.select { |record| record.summary_date == date }
       end
 
-      class Record < ::OuraRingApi::Response::Base::Record
+      # rubocop:todo Style/Documentation
+      class Record < ::OuraRingApi::Response::Base::Record # rubocop:todo Metrics/ClassLength, Style/Documentation
+        # rubocop:enable Style/Documentation
         def self.record_key
           "sleep"
         end
