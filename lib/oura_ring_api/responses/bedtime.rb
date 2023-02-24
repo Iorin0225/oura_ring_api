@@ -4,13 +4,13 @@ require_relative "base"
 
 module OuraRingApi
   module Response
-    class Bedtime < Base
+    class Bedtime < Base # rubocop:todo Style/Documentation
       def find_by_date(date)
         date = date.strftime("%Y-%m-%d") if date.respond_to?(:strftime)
         records.select { |record| record.date == date }
       end
 
-      class Record < ::OuraRingApi::Response::Base::Record
+      class Record < ::OuraRingApi::Response::Base::Record # rubocop:todo Style/Documentation
         def self.record_key
           "ideal_bedtimes"
         end

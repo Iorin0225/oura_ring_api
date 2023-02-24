@@ -2,7 +2,7 @@
 
 module OuraRingApi
   module Response
-    class Base
+    class Base # rubocop:todo Style/Documentation
       attr_accessor :response, :records
 
       def initialize(response)
@@ -63,7 +63,7 @@ module OuraRingApi
         end
       end
 
-      class Record
+      class Record # rubocop:todo Style/Documentation
         attr_accessor :body
 
         KEYS              = %w[].freeze # keys on child class
