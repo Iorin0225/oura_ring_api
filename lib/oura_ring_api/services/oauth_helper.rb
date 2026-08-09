@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
+require "time"
+
 module OuraRingApi
   class OauthHandler # rubocop:todo Style/Documentation
-    CALLBACK_URL  = "http://localhost:8080"
     OAUTH2_SITE   = "https://cloud.ouraring.com"
-    OAUTH2_URL    = "#{OAUTH2_SITE}/oauth/authorize".freeze
     OAUTH2_TOKEN_URL = "https://api.ouraring.com/oauth/token"
 
-    attr_accessor :client_id, :client_secret, :access_token, :refresh_token, :expires_at
+    attr_accessor :client_id, :client_secret, :redirect_uri, :scopes, :access_token, :refresh_token, :expires_at
 
-    def initialize(client_id = nil, client_secret = nil)
+    def initialize(client_id:, client_secret:, redirect_uri:, scopes:)
       self.client_id     = client_id
       self.client_secret = client_secret
+      self.redirect_uri = redirect_uri
+      self.scopes = scopes
     end
 
     def authenticated?
@@ -24,13 +26,17 @@ module OuraRingApi
       !expires_at.nil? && expires_at <= Time.now
     end
 
-    def url_to_generate_code
-      "#{OAUTH2_URL}?client_id=#{client_id}&redirect_uri=#{CALLBACK_URL}&response_type=code"
+    def authorization_url(state:)
+      oauth2_client.auth_code.authorize_url(
+        redirect_uri: redirect_uri,
+        scope: scopes.join(" "),
+        state: state
+      )
     end
 
     def fetch_token_from_code(authrorize_code)
       response = oauth2_client.auth_code.get_token(authrorize_code,
-                                                   redirect_uri: CALLBACK_URL)
+                                                   redirect_uri: redirect_uri)
       token_info = token_info_hash(response)
       save_token_info(token_info)
 
@@ -41,7 +47,7 @@ module OuraRingApi
       return false if refresh_token.nil?
 
       oauth2_access_token = OAuth2::AccessToken.new(
-        client,
+        oauth2_client,
         access_token,
         refresh_token: refresh_token,
         expires_at: expires_at.to_i
@@ -66,15 +72,22 @@ module OuraRingApi
     def save_token_info(token_info)
       self.access_token = token_info[:access_token]
       self.refresh_token = token_info[:refresh_token]
-      self.expires_at = Time.parse(token_info[:expires_at])
+      self.expires_at = parse_expiration(token_info[:expires_at])
     end
 
     def token_info_hash(response)
       {
         access_token: response.token,
         refresh_token: response.refresh_token,
-        expires_at: Time.at(response.expires_at).strftime("%Y-%m-%d %H:%M:%S")
+        expires_at: response.expires_at
       }
+    end
+
+    def parse_expiration(value)
+      return Time.at(value) if value.is_a?(Numeric)
+      return Time.at(value.to_i) if value.to_s.match?(/\A\d+\z/)
+
+      Time.parse(value)
     end
   end
 end
