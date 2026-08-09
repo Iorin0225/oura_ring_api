@@ -1,13 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "v1/base"
+require_relative "base"
 
 module OuraRingApi
   module Response
-    class PersonalInfo < ::OuraRingApi::Response::V1::Base
-      def multiple?
-        false
-      end
+    class PersonalInfo < Base
 
       KEYS = %w[
         age
@@ -19,7 +16,7 @@ module OuraRingApi
 
       KEYS.each do |key|
         define_method(key) do
-          body[key]
+          data.first[key]
         end
       end
 

@@ -15,9 +15,13 @@ module OuraRingApi
         response.success?
       end
 
+      def next_token
+        response.body["next_token"] if response.body.is_a?(Hash)
+      end
+
       def data
-        if response.body.key?("data")
-          response.body["data"]
+        if response.body.is_a?(Hash) && response.body.key?("data")
+          Array(response.body["data"])
         else
           [response.body]
         end
