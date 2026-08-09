@@ -1,109 +1,69 @@
 # OuraRingApi
 
-This gem handles communicating with Oura Cloud API, the API service with OuraRing!
-
-If you want to know more detail, see this: https://cloud.ouraring.com/docs
+Oura API V2用 Ruby client。Oura API V1とPersonal Access Tokenは対応外。
 
 ## Installation
 
-Add this line to your application's Gemfile:
+```ruby
+gem "oura_ring_api"
+```
+
+Ruby 3.4.8以上が必要。
+
+## OAuth 2.0
+
+Oura CloudでOAuth applicationを登録し、登録済みのredirect URIを指定する。
 
 ```ruby
-gem 'oura_ring_api'
+client = OuraRingApi::Client.new(
+  client_id: ENV.fetch("OURA_CLIENT_ID"),
+  client_secret: ENV.fetch("OURA_CLIENT_SECRET"),
+  redirect_uri: "https://example.com/oura/callback"
+)
+
+redirect_to client.authorization_url(state: csrf_token)
 ```
 
-And then execute:
+`state`はアプリケーション側でランダム生成し、callbackで検証する。
 
-    $ bundle install
+```ruby
+token_info = client.authenticate(code: params[:code])
+# token_infoを安全な永続ストアへ保存する。refresh tokenは更新ごとに置換する。
 
-Or install it yourself as:
-
-    $ gem install oura_ring_api
-
-## Usage
-
-This gem has 2 ways to use.
-
-### Personal Access Token (for development)
-
-This is really simple and easy to use, but it's only for development
-
-#### 1. Create you Personal Access Token on Oura Cloud.
-
-Access here: https://cloud.ouraring.com/personal-access-tokens
-
-#### 2. Set the token to the client class
-
-```rb
-client = OuraRingApi::Client.new(personal_access_token: your_token)
-client.userinfo.body # This would work
+client = OuraRingApi::Client.new(
+  client_id: ENV.fetch("OURA_CLIENT_ID"),
+  client_secret: ENV.fetch("OURA_CLIENT_SECRET"),
+  redirect_uri: "https://example.com/oura/callback",
+  token_info: token_info
+)
 ```
 
-### OAuth2 Flow
+トークンを自動refreshした後は、`client.token_info` を再保存する。
 
-Oura Cloud requires us to use OAuth2 Authentication flow for third party app.
+デフォルトscopeは`email personal daily workout tag session`。必要に応じて`scopes:`へ配列を渡す。
 
-#### 1. Register your application on Oura Cloud.
+## Data
 
-Access here: https://cloud.ouraring.com/oauth/applications
+利用可能なV2 endpoint: `personal_info`、`daily_sleep`、`sleep`、`daily_activity`、`daily_readiness`、`session`、`tag`、`workout`。
 
-(At now, please use "http://localhost:8080" for redirect url. It's just WIP :bow: )
+```ruby
+page = client.daily_activity("2026-01-01", "2026-01-31", fields: "steps")
+page.records.each { |record| puts record.steps }
 
-After you register your application, you will get Client ID and Client Secret.
+client.each_page(:daily_activity, start_date: "2026-01-01") do |response|
+  response.records.each { |record| puts record.steps }
+end
 
-#### 2. Set Client ID and Client Secret to the client class
-
-```rb
-client = OuraRingApi::Client.new(client_id: your_id, client_secret: your_secret)
+sleep = client.sleep(document_id: "sleep-document-id")
 ```
 
-#### 3. Get an access_token
+list endpointは`next_token:`と`fields:`を受け取る。`each_page`は明示的に全pageを列挙する。
 
-The client class generate an url to generate access token.
-
-```rb
- client.url_to_generate_code
-=> "https://cloud.ouraring.com/oauth/authorize?client_id=******&redirect_uri=http://localhost:8080&response_type=code"
-```
-
-Access the URL and then please "Acceppt". 
-
-After that, you'll be redirected to the URL like `http://localhost:8080/?code=***&scope=email%20personal%20daily`. So please copy the code on the URL.
-
-#### 4. Set the code to the client
-
-```rb
-client.authenticate(code: '****')
-=> {:access_token=>"****", :refresh_token=>"****", :expires_at=>"2021-10-30 17:05:18"}
-
-client.userinfo.body # This would work
-```
-
-#### 5. Initialize the client with the result of Oauth2
-
-You can re-use the result of OAuth2by 
-
-```rb
-your_token_info = {:access_token=>"****", :refresh_token=>"****", :expires_at=>"2021-10-30 17:05:18"}
-client = OuraRingApi::Client.new(token_info: your_token_info)
-
-client.userinfo.body # This would work
-```
+非2xx responseは`OuraRingApi::HttpError`をraiseする。`status`、`body`、`headers`を参照できる。429の自動retryは行わない。
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/oura_ring_api. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/oura_ring_api/blob/master/CODE_OF_CONDUCT.md).
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the OuraRingApi project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/oura_ring_api/blob/master/CODE_OF_CONDUCT.md).
+```sh
+bundle _2.6.9_ install
+bundle _2.6.9_ exec rspec
+```
